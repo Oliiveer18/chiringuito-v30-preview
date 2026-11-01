@@ -1,16 +1,16 @@
 /* Plan de apertura: compras, carta, mejoras y listo. Lo importa ui.js. */
-import { trackCost } from './bookkeeping.js?v=31.0.0';
-import { CONCERT_EVENT, GOAL, HOUR_CURVE, ITEMS, ITEM_IDS, RENT, SEASON_DAYS, SPECIAL_DAYS, STAFF, UPGRADES, WEATHER, concertDay } from './config.js?v=31.0.0';
-import { $, clamp, escapeHtml, eur, eur2 } from './util.js?v=31.0.0';
-import { ICON_URL } from './icons.js?v=31.0.0';
-import { Audio } from './audio.js?v=31.0.0';
-import { Game, Net, activeItems, closeHour, dayName, isCoop, isGuest, isWeekend, itemUnlocked, lvl, openHours, partner, queueSpots, simProgressDay, tableCount, wages, weatherAt, weatherToday } from './state.js?v=31.0.0';
-import { buyStock, difficultyProfile, difficultyRush, newSeason, startDay } from './sim.js?v=31.0.0';
-import { advanceFromReport } from './report.js?v=31.0.0';
-import { netAct, netDirty } from './net.js?v=31.0.0';
-import { drawPerson } from './render.js?v=31.0.0';
-import { iconFor } from './ui-polish.js?v=31.0.0';
-import { estimateCustomers, renderTab, toast } from './ui.js?v=31.0.0';
+import { trackCost } from './bookkeeping.js?v=31.1.0';
+import { CONCERT_EVENT, GOAL, HOUR_CURVE, ITEMS, ITEM_IDS, RENT, SEASON_DAYS, SPECIAL_DAYS, STAFF, UPGRADES, WEATHER, concertDay } from './config.js?v=31.1.0';
+import { $, clamp, escapeHtml, eur, eur2 } from './util.js?v=31.1.0';
+import { ICON_URL } from './icons.js?v=31.1.0';
+import { Audio } from './audio.js?v=31.1.0';
+import { Game, Net, activeItems, closeHour, dayName, EMPIRE_EVENT_LABEL, empireIncome, isCoop, isGuest, isWeekend, itemUnlocked, lvl, openHours, partner, queueSpots, simProgressDay, tableCount, wages, weatherAt, weatherToday } from './state.js?v=31.1.0';
+import { buyStock, difficultyProfile, difficultyRush, newSeason, startDay } from './sim.js?v=31.1.0';
+import { advanceFromReport } from './report.js?v=31.1.0';
+import { netAct, netDirty } from './net.js?v=31.1.0';
+import { drawPerson } from './render.js?v=31.1.0';
+import { iconFor } from './ui-polish.js?v=31.1.0';
+import { estimateCustomers, renderTab, toast } from './ui.js?v=31.1.0';
 // ---------- Pantallas ----------
 export function hideAll(){ document.querySelectorAll('.overlay').forEach(o=>o.classList.remove('show')); }
 export const Plan={tab:'compras'};
@@ -60,6 +60,13 @@ export function renderForecast(){
   const capTag = ratio>1.15?'bad':ratio>0.9?'mid':'good';
   html += `<div class="fc"><div class="k">Capacidad</div><div class="v"><span class="tag ${capTag}">${capLabel}</span></div><div class="d">Hoy esperas ~${Math.round(demand)} clientes y puedes atender ~${cap.capacity} (${cap.rate}/h con ${cap.slots} puesto${cap.slots>1?'s':''}, ${cap.seats} sitios entre cola y mesas). ${ratio>1.15?'Se te escapará gente: reforma o plantilla.':ratio>0.9?'Aguanta, pero sin margen para errores.':'La estructura responde.'}</div></div>`;
   if(Game.buzz>0.03) html += `<div class="fc"><div class="k">Boca a boca</div><div class="v">+${Math.round(Game.buzz*12)}%</div><div class="d">Recomendaciones de habituales contentos: más afluencia hoy.</div></div>`;
+  /* v31.1: el imperio, con su ingreso nocturno previsto por local y el
+     acontecimiento de esta noche anunciado antes de abrir */
+  const emp = empireIncome();
+  if(emp.owned.length){
+    const evs = emp.owned.filter(v=>v.event);
+    html += `<div class="fc"><div class="k">Imperio</div><div class="v">+${eur(emp.total)} esta noche</div><div class="d">${emp.owned.map(v=>`${v.name} +${eur(v.income)}`).join(' · ')}${evs.length?` · ¡${evs.map(v=>`${EMPIRE_EVENT_LABEL[v.event]} en ${v.name} (${v.event==='averia'?'−50%':'+30%'})`).join(' y ')}!`:''}</div></div>`;
+  }
   $('#forecast').innerHTML=html;
 }
 export function refreshPlanMoney(){

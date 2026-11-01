@@ -1,5 +1,5 @@
-export const VERSION='v31.0.0';
-export const LABEL='v31.0.0 · el imperio: locales de marca fuera de la playa (El Médano, Los Cristianos) que ingresan cada noche según tu reputación, con su línea en el informe y su sección en el plan · más allá: momento de reforma con obreros, semáforos de cola y capacidad visible (v30.1–v30.2)';
+export const VERSION='v31.1.0';
+export const LABEL='v31.1.0 · el imperio con vida propia: cada local tiene su noche (ritmo propio, finde turístico) y acontecimientos que el plan anuncia y el informe explica (avería −50%, fiesta del pueblo +30%) · base v31: locales de marca en El Médano y Los Cristianos que ingresan cada noche según tu reputación';
 document.documentElement.dataset.version=VERSION;
 const old=document.getElementById('version-badge');if(old)old.remove();
 const title=document.getElementById('ver-title');if(title)title.textContent=LABEL;

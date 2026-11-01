@@ -1,7 +1,7 @@
 /* Pestaña Mejoras del plan: secciones compactas. Importado desde ui.js */
-import { UPGRADES } from './config.js?v=31.0.0';
-import { escapeHtml, eur } from './util.js?v=31.0.0';
-import { Game, empireIncome, lvl } from './state.js?v=31.0.0';
+import { UPGRADES } from './config.js?v=31.1.0';
+import { escapeHtml, eur } from './util.js?v=31.1.0';
+import { Game, EMPIRE_EVENT_LABEL, empireIncome, lvl } from './state.js?v=31.1.0';
 
 const MEJORAS_SECTIONS = [
   { title: 'Reformas del chiringuito', ids: ['palapa', 'terraza', 'escenario'] },
@@ -84,13 +84,15 @@ export function renderMejorasTab() {
   /* v30: nivel visual del kiosco con las reformas compradas (1-4) */
   const reforms = Math.min(3, lvl('palapa') + lvl('terraza') + lvl('escenario'));
   const reformNames = ['Chiringo de madera', 'Palapa', 'Terraza techada', 'Chiringo de referencia'];
-  /* v31: el imperio, con su ingreso nocturno previsto a la vista */
+  /* v31: el imperio, con su ingreso nocturno previsto a la vista
+     v31.1: desglose por local y aviso del acontecimiento de esta noche */
   const empire = empireIncome();
   let h = `<div class="up-summary" role="status">
     <span class="up-summary-cash">En caja <b>${eur(Game.money)}</b></span>
     <span class="up-summary-owned">${ownedLevels} de ${maxLevels} niveles instalados</span>
     <span class="up-summary-owned">Kiosco nivel ${1 + reforms}/4 · ${reformNames[reforms]}</span>
-    ${empire.owned.length?`<span class="up-summary-owned">Imperio: ${empire.owned.length} local${empire.owned.length>1?'es':''} · +${eur(empire.total)}/noche</span>`:''}
+    ${empire.owned.length?`<span class="up-summary-owned">Imperio esta noche: ${empire.owned.map(v=>`${v.name} +${eur(v.income)}`).join(' · ')} = <b>+${eur(empire.total)}</b></span>`:''}
+    ${empire.owned.some(v=>v.event)?`<span class="up-summary-owned">${empire.owned.filter(v=>v.event).map(v=>`¡${EMPIRE_EVENT_LABEL[v.event].charAt(0).toUpperCase()+EMPIRE_EVENT_LABEL[v.event].slice(1)} en ${v.name}! (${v.event==='averia'?'−50%':'+30%'} esta noche)`).join(' · ')}</span>`:''}
   </div>`;
   for (const sec of MEJORAS_SECTIONS) {
     if (!sec.ids.some(id => upgradeById(id))) continue;

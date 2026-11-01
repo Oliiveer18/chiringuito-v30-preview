@@ -2,7 +2,7 @@
    state.js
    Estado global: objetos Game y Net, derivados de progreso y temporizadores del día.
    ========================================================= */
-import { DAY_NAMES, ITEMS, ITEM_IDS, SEASON_DAYS, SEC_PER_HOUR, STAFF, START_MONEY, WEATHER } from './config.js?v=31.0.0';
+import { DAY_NAMES, ITEMS, ITEM_IDS, SEASON_DAYS, SEC_PER_HOUR, STAFF, START_MONEY, WEATHER } from './config.js?v=31.1.0';
 
 // ---------- Estado del juego ----------
 export const Game = {
@@ -59,11 +59,39 @@ export function queueSpots(){ return 6 + 2*lvl('palapa'); }
 export function reformLevel(){ return 1 + lvl('palapa') + lvl('terraza') + lvl('escenario'); }
 /* v31: el imperio. Los locales fuera de la playa generan ingresos cada noche
    según la reputación de la marca: mejor valoración = más visitas en los
-   locales. Fórmula por local: 400 € + 150 € por punto de reputación. */
+   locales. Base por local: 400 € + 150 € por punto de reputación. */
+/* v31.1: cada local tiene su propia noche, determinista por día (mismo patrón
+   que los rivales y los conciertos): ritmo propio de la zona (±12%), finde
+   turístico (+25%) y acontecimientos puntuales que el plan anuncia por la
+   mañana y el informe explica al cierre (avería −50%, fiesta del pueblo +30%).
+   El plan y el informe siempre coinciden porque ambos usan Game.day. */
+export const EMPIRE_VENUES = [
+  { id:'elmedano',     name:'El Médano' },
+  { id:'loscristianos', name:'Los Cristianos' },
+];
+export const EMPIRE_EVENT_LABEL = { averia:'avería', fiesta:'fiesta del pueblo' };
+export function empireVenueEvent(id, day){
+  const h = ((Math.imul(day + 1, 2654435761) ^ (id.length * 97)) >>> 0) % 1000 / 1000;
+  if (h < 0.08) return 'averia';
+  if (h > 0.92) return 'fiesta';
+  return null;
+}
+export function empireVenueNight(id, day, rep){
+  const base = 400 + 150 * rep;
+  const rhythm = 0.88 + 0.24 * ((Math.imul(day, 2654435761) >>> 0) % 1000 / 1000);
+  const weekend = isWeekend(day) ? 1.25 : 1;
+  const ev = empireVenueEvent(id, day);
+  const evMul = ev === 'averia' ? 0.5 : ev === 'fiesta' ? 1.3 : 1;
+  return Math.round(base * rhythm * weekend * evMul);
+}
 export function empireIncome(){
+  const day = Game.day;
   let total=0; const owned=[];
-  for(const id of ['elmedano','loscristianos']){
-    if(lvl(id)){ total += Math.round(400 + 150*Game.rep); owned.push(id); }
+  for(const v of EMPIRE_VENUES){
+    if(!lvl(v.id)) continue;
+    const income = empireVenueNight(v.id, day, Game.rep);
+    owned.push({ id:v.id, name:v.name, income, event:empireVenueEvent(v.id, day) });
+    total += income;
   }
   return {total, owned};
 }
