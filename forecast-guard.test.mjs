@@ -6,7 +6,7 @@ import assert from 'node:assert/strict';
 import { register } from 'node:module';
 
 const STUBS = {
-  './ui.js': "export const Plan={tab:'compras'};export const toasts=[];export const toast=(t,x,k)=>{toasts.push([t,x,k]);};export const toastLocal=toast;export function renderTab(){};export function showPlan(){};export function hideAll(){};export function showFinal(){};export function updateReadyUI(){};export function refreshPlanMoney(){};",
+  './ui.js': "export const Plan={tab:'compras'};export const toasts=[];export const toast=(t,x,k)=>{toasts.push([t,x,k]);};export const toastLocal=toast;export function renderTab(){};export function showPlan(){};export function hideAll(){};export function showFinal(){};export function updateReadyUI(){};export function refreshPlanMoney(){};export function estimateCustomers(){return 100;};",
   './net.js': "export const sent=[];export const netDirty=()=>{};export const netAct=o=>{sent.push(o);};",
   './sim.js': "export function buyStock(){};export function difficultyProfile(){return{arrivals:1,patience:1,peak:0,label:''};};export function difficultyRush(){return 1;};export function newSeason(){};export function startDay(){};",
   './icons.js': "export const ICON_URL={};export const EXTRA={};export function rr(){};",
