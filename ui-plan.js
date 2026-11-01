@@ -1,16 +1,16 @@
 /* Plan de apertura: compras, carta, mejoras y listo. Lo importa ui.js. */
-import { trackCost } from './bookkeeping.js?v=31.1.0';
-import { CONCERT_EVENT, GOAL, HOUR_CURVE, ITEMS, ITEM_IDS, RENT, SEASON_DAYS, SPECIAL_DAYS, STAFF, UPGRADES, WEATHER, concertDay } from './config.js?v=31.1.0';
-import { $, clamp, escapeHtml, eur, eur2 } from './util.js?v=31.1.0';
-import { ICON_URL } from './icons.js?v=31.1.0';
-import { Audio } from './audio.js?v=31.1.0';
-import { Game, Net, activeItems, closeHour, dayName, EMPIRE_EVENT_LABEL, empireIncome, isCoop, isGuest, isWeekend, itemUnlocked, lvl, openHours, partner, queueSpots, simProgressDay, tableCount, wages, weatherAt, weatherToday } from './state.js?v=31.1.0';
-import { buyStock, difficultyProfile, difficultyRush, newSeason, startDay } from './sim.js?v=31.1.0';
-import { advanceFromReport } from './report.js?v=31.1.0';
-import { netAct, netDirty } from './net.js?v=31.1.0';
-import { drawPerson } from './render.js?v=31.1.0';
-import { iconFor } from './ui-polish.js?v=31.1.0';
-import { estimateCustomers, renderTab, toast } from './ui.js?v=31.1.0';
+import { trackCost } from './bookkeeping.js?v=32.0.0';
+import { CONCERT_EVENT, GOAL, HOUR_CURVE, ITEMS, ITEM_IDS, RENT, SEASON_DAYS, SPECIAL_DAYS, STAFF, UPGRADES, WEATHER, concertDay } from './config.js?v=32.0.0';
+import { $, clamp, escapeHtml, eur, eur2 } from './util.js?v=32.0.0';
+import { ICON_URL } from './icons.js?v=32.0.0';
+import { Audio } from './audio.js?v=32.0.0';
+import { Game, Net, activeItems, BRAND_EVENTS, brandEvent, closeHour, dayName, EMPIRE_EVENT_LABEL, empireIncome, isCoop, isGuest, isWeekend, itemUnlocked, lvl, openHours, partner, queueSpots, simProgressDay, tableCount, wages, weatherAt, weatherToday } from './state.js?v=32.0.0';
+import { buyStock, difficultyProfile, difficultyRush, newSeason, startDay } from './sim.js?v=32.0.0';
+import { advanceFromReport } from './report.js?v=32.0.0';
+import { netAct, netDirty } from './net.js?v=32.0.0';
+import { drawPerson } from './render.js?v=32.0.0';
+import { iconFor } from './ui-polish.js?v=32.0.0';
+import { estimateCustomers, renderTab, toast } from './ui.js?v=32.0.0';
 // ---------- Pantallas ----------
 export function hideAll(){ document.querySelectorAll('.overlay').forEach(o=>o.classList.remove('show')); }
 export const Plan={tab:'compras'};
@@ -37,6 +37,29 @@ export function serviceCapacity(){
   const seats = tableCount()*2 + queueSpots() + (lvl('escenario')?2:0);
   const hours = openHours();
   return {slots, rate, seats, hours, capacity: Math.round(rate*hours)};
+}
+/* v32: capacidad multicanal. La jornada se reparte por canales — la barra
+   atiende en marcha, la terraza sienta y descarga la barra, la ventanilla
+   express se lleva las bebidas — y por la noche la marca atiende en sus
+   locales. Cada canal con su semáforo y su consejo: la jugadora entiende
+   qué compra resuelve qué canal ANTES de abrir. */
+export function channelsCapacity(){
+  const cap = serviceCapacity();
+  const demand = estimateCustomers();
+  const emp = empireIncome();
+  const ratio = cap.capacity ? demand/cap.capacity : 0;
+  const tag = ratio>1.15?'bad':ratio>0.9?'mid':'good';
+  const rows = [
+    { id:'barra', name:'Barra', v:`${cap.rate}/h`, tag, label: ratio>1.15?'Saturada':ratio>0.9?'Al límite':'Con holgura',
+      d:`Atiendes en marcha con ${cap.slots} puesto${cap.slots>1?'s':''} (${cap.hours} h abiertas). ${ratio>1.15?'Se acumulará la fila: más plantilla o reparto de carga.':ratio>0.9?'Aguanta, pero sin margen para errores.':'La barra responde.'}` },
+    { id:'terraza', name:'Terraza y mesas', v:`${tableCount()*2} sitios`, tag: tableCount()<10?'mid':'good', label: tableCount()<10?'Ampliable':'Al máximo',
+      d:`${tableCount()} mesa${tableCount()>1?'s':''} + fila Terraza de la cola (${Math.ceil(queueSpots()/2)} puestos). Quien quiere mesa espera en su fila: compra mesas o Terraza para sentar a más.` },
+  ];
+  if(lvl('escenario')) rows.push({ id:'express', name:'Ventanilla express', v:'activa', tag:'good', label:'Descarga la barra',
+    d:'Las bebidas para llevar se desvían a la ventanilla: menos gente acumulada en la fila principal.' });
+  if(emp.owned.length) rows.push({ id:'marca', name:'Marca (nocturno)', v:`+${eur(emp.total)}`, tag:'good', label:'Fuera de la jornada',
+    d:`${emp.owned.map(v=>`${v.name} +${eur(v.income)}`).join(' · ')} — ingresa al cierre, no consume capacidad del día.` });
+  return { rows, demand, capacity: cap.capacity, ratio };
 }
 export function renderForecast(){
   const w=weatherToday(), tw=weatherAt(Game.day+1);
@@ -66,6 +89,16 @@ export function renderForecast(){
   if(emp.owned.length){
     const evs = emp.owned.filter(v=>v.event);
     html += `<div class="fc"><div class="k">Imperio</div><div class="v">+${eur(emp.total)} esta noche</div><div class="d">${emp.owned.map(v=>`${v.name} +${eur(v.income)}`).join(' · ')}${evs.length?` · ¡${evs.map(v=>`${EMPIRE_EVENT_LABEL[v.event]} en ${v.name} (${v.event==='averia'?'−50%':'+30%'})`).join(' y ')}!`:''}</div></div>`;
+  }
+  /* v32: capacidad multicanal — cada canal con su semáforo */
+  const chn = channelsCapacity();
+  if(chn.rows.length){
+    html += `<div class="fc"><div class="k">Canales</div><div class="v">Día por canales</div><div class="d">${chn.rows.map(r=>`<b>${r.name}</b> <span class="tag ${r.tag}">${r.label}</span> ${r.v} · ${r.d}`).join('<br>')}</div></div>`;
+  }
+  /* v32: evento de marca del día, anunciado antes de abrir */
+  const bEv = brandEvent(Game.day);
+  if(bEv){
+    html += `<div class="fc event"><div class="k">Marca</div><div class="v">${BRAND_EVENTS[bEv].label}</div><div class="d">${BRAND_EVENTS[bEv].desc}</div></div>`;
   }
   $('#forecast').innerHTML=html;
 }

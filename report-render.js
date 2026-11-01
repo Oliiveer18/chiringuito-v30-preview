@@ -1,14 +1,14 @@
 /* Render del informe de fin de día. Lo importa report.js. */
-import {operatingResult,ledgerHtml,capitalNote} from './bookkeeping.js?v=31.1.0';
-import { ITEMS, ITEM_IDS, REGULARS, REG_TOWN, RENT, SEASON_DAYS, SEC_PER_HOUR, STATION_COLOR, STATION_LABEL, TYPES } from './config.js?v=31.1.0';
-import { $, clamp, escapeHtml, eur, rnd, stars } from './util.js?v=31.1.0';
-import { rr } from './icons.js?v=31.1.0';
-import { Audio } from './audio.js?v=31.1.0';
-import { experienceSummary, reputation } from './ratings-model.mjs?v=31.1.0';
-import { Game, Net, closeHour, dayName, EMPIRE_EVENT_LABEL, empireIncome, isCoop, isGuest, lvl, wages, workedWages, openHours, staffOnDuty } from './state.js?v=31.1.0';
-import { hideAll, showFinal, showPlan, toast, updateReadyUI } from './ui.js?v=31.1.0';
-import { netAct, netDirty } from './net.js?v=31.1.0';
-import { dayStarsSummary, buildRevModel, Rev, REV_RESP_MAX, REV_INVITE_COST, REV_INVITE_REP, REV_APOLOGY_REP } from './report-model.js?v=31.1.0';
+import {operatingResult,ledgerHtml,capitalNote} from './bookkeeping.js?v=32.0.0';
+import { ITEMS, ITEM_IDS, REGULARS, REG_TOWN, RENT, SEASON_DAYS, SEC_PER_HOUR, STATION_COLOR, STATION_LABEL, TYPES } from './config.js?v=32.0.0';
+import { $, clamp, escapeHtml, eur, rnd, stars } from './util.js?v=32.0.0';
+import { rr } from './icons.js?v=32.0.0';
+import { Audio } from './audio.js?v=32.0.0';
+import { experienceSummary, reputation } from './ratings-model.mjs?v=32.0.0';
+import { Game, Net, closeHour, dayName, BRAND_EVENTS, brandEvent, EMPIRE_EVENT_LABEL, empireIncome, isCoop, isGuest, lvl, wages, workedWages, openHours, staffOnDuty } from './state.js?v=32.0.0';
+import { hideAll, showFinal, showPlan, toast, updateReadyUI } from './ui.js?v=32.0.0';
+import { netAct, netDirty } from './net.js?v=32.0.0';
+import { dayStarsSummary, buildRevModel, Rev, REV_RESP_MAX, REV_INVITE_COST, REV_INVITE_REP, REV_APOLOGY_REP } from './report-model.js?v=32.0.0';
 
 export function endDay(){
   Game.mode='report';
@@ -41,7 +41,7 @@ export function endDay(){
   $('#rep-title').textContent = net>=0 ? (net>600?'¡Día redondo!':'Buen día de playa') : 'Día flojo';
   const soldStr = Object.entries(s.sold).sort((a,b)=>b[1]-a[1]).map(([id,n])=>`<span class="tag">${n} ${ITEMS[id].name.toLowerCase()}</span>`).join(' ');
   Game.revModel = buildRevModel(s, dayStars);
-  Game.revModel.acc = { wage, rent, spoilVal, spoilLines, soldStr, repStart:s.repStart, venues };
+  Game.revModel.acc = { wage, rent, spoilVal, spoilLines, soldStr, repStart:s.repStart, venues, brand: brandEvent(Game.day) };
   Rev.expanded = false; Rev.shownDay = Game.day;
   const last = Game.day>=SEASON_DAYS;
   const bankrupt = Game.money < -300;
@@ -132,6 +132,7 @@ export function reportStatsHtml(s, m){
       ${s.hamacas>0.5?`<span>Alquiler de hamacas</span><span class="pos">+${eur(s.hamacas)}</span>`:''}
       ${acc.venues&&acc.venues.total>0?`<span>Locales del imperio (${acc.venues.owned.length})</span><span class="pos">+${eur(acc.venues.total)}</span>`:''}
       ${acc.venues&&acc.venues.owned.length?`<span class="muted">— ${acc.venues.owned.map(v=>`${v.name} +${eur(v.income)}${v.event?` (${EMPIRE_EVENT_LABEL[v.event]})`:''}`).join(' · ')}</span><span></span>`:''}
+      ${acc.brand?`<span>${BRAND_EVENTS[acc.brand].label}</span><span class="${BRAND_EVENTS[acc.brand].sign==='good'?'pos':'neg'}">${BRAND_EVENTS[acc.brand].empireMul>1?'+':'−'}${Math.round(Math.abs(BRAND_EVENTS[acc.brand].empireMul-1)*100)}% en los locales</span>`:''}
       <span>Compras de género (mañana)</span><span class="neg">−${eur(s.purchases)}</span>
       ${s.urgent?`<span>Pedidos urgentes</span><span class="neg">−${eur(s.urgent)}</span>`:''}
       ${wageLine(s,acc)}

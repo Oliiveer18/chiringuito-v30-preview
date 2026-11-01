@@ -231,3 +231,12 @@ body:has(.overlay.show:not(#title):not(#final)) #btn-full-page{display:none}
 .wf-bar i{display:block;height:100%;border-radius:5px}
 .wf-bad{color:#b3402f}
 .wf-warning{color:#b3402f;font-weight:600}
+
+/* ---------- v32: mapa de la isla (pestaña Isla) ---------- */
+.island-svg{width:100%;max-width:520px;display:block;margin:0 auto 10px;border-radius:14px;background:#cfe8ea}
+.map-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.map-card{padding:10px 12px;border:1px solid #e3d5b3;border-radius:12px;background:#fffaf0;font-size:13px}
+.map-card.own{border-color:#9fd4cf;background:linear-gradient(135deg,#e6f4f2 0%,#fffaf0 100%)}
+.map-card.locked{opacity:.82}
+.map-card-head{display:flex;align-items:center;justify-content:space-between;gap:6px;font-weight:700;font-size:13.5px;margin-bottom:3px}
+.map-card-body{color:var(--ink-2);font-size:12.5px}

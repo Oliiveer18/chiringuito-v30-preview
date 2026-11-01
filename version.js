@@ -1,5 +1,5 @@
-export const VERSION='v31.1.0';
-export const LABEL='v31.1.0 · el imperio con vida propia: cada local tiene su noche (ritmo propio, finde turístico) y acontecimientos que el plan anuncia y el informe explica (avería −50%, fiesta del pueblo +30%) · base v31: locales de marca en El Médano y Los Cristianos que ingresan cada noche según tu reputación';
+export const VERSION='v32.0.0';
+export const LABEL='v32.0.0 · la marca: mapa de la isla con tus locales (pestaña Isla), capacidad multicanal por primera vez visible (barra, terraza, express y marca nocturna con semáforo) y eventos de marca que mueven afluencia y noches (guía de la isla, reportaje en la tele, queja vecinal) · v31: el imperio con vida propia';
 document.documentElement.dataset.version=VERSION;
 const old=document.getElementById('version-badge');if(old)old.remove();
 const title=document.getElementById('ver-title');if(title)title.textContent=LABEL;

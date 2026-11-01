@@ -2,7 +2,7 @@
    state.js
    Estado global: objetos Game y Net, derivados de progreso y temporizadores del día.
    ========================================================= */
-import { DAY_NAMES, ITEMS, ITEM_IDS, SEASON_DAYS, SEC_PER_HOUR, STAFF, START_MONEY, WEATHER } from './config.js?v=31.1.0';
+import { DAY_NAMES, ITEMS, ITEM_IDS, SEASON_DAYS, SEC_PER_HOUR, STAFF, START_MONEY, WEATHER } from './config.js?v=32.0.0';
 
 // ---------- Estado del juego ----------
 export const Game = {
@@ -82,8 +82,30 @@ export function empireVenueNight(id, day, rep){
   const weekend = isWeekend(day) ? 1.25 : 1;
   const ev = empireVenueEvent(id, day);
   const evMul = ev === 'averia' ? 0.5 : ev === 'fiesta' ? 1.3 : 1;
-  return Math.round(base * rhythm * weekend * evMul);
+  /* v32: los eventos de marca mueven la noche de TODOS los locales */
+  const bEv = brandEvent(day);
+  const bMul = bEv ? BRAND_EVENTS[bEv].empireMul : 1;
+  return Math.round(base * rhythm * weekend * evMul * bMul);
 }
+/* v32: eventos de marca. Con el imperio en marcha, la marca ya no vive solo en
+   la playa: la isla entera se entera de lo que pasa en tus locales. Cada
+   evento es determinista por día (mismo patrón que conciertos y rivales),
+   se anuncia en el plan (pronóstico, mapa y Mejoras) y se explica en el
+   informe. Solo ocurren si ya posees al menos un local del imperio. */
+export const BRAND_EVENTS = {
+  guia:  { label:'La Guía de la Isla te destaca', empireMul:1,    arrMul:1.15, sign:'good', desc:'La guía gastronómica de la isla incluye tu marca: +15% de afluencia hoy en la playa.' },
+  tv:    { label:'Reportaje en la tele regional',  empireMul:1.5,  arrMul:1.10, sign:'good', desc:'Un equipo de la tele grabó en tus locales: noche redonda en todo el imperio (+50% esta noche).' },
+  queja: { label:'Queja vecinal por el ruido',    empireMul:0.7,  arrMul:0.95, sign:'bad',  desc:'Los vecinos protestan por los conciertos: los locales lo notan esta noche (−30%).' },
+};
+export function brandEvent(day){
+  if(!lvl('elmedano')) return null;
+  const h = ((Math.imul(day + 7, 2654435761) ^ 31337) >>> 0) % 1000 / 1000;
+  if (h < 0.10) return 'guia';
+  if (h < 0.17) return 'tv';
+  if (h < 0.24) return 'queja';
+  return null;
+}
+export function brandMods(){ const ev = brandEvent(Game.day); return ev ? BRAND_EVENTS[ev] : null; }
 export function empireIncome(){
   const day = Game.day;
   let total=0; const owned=[];

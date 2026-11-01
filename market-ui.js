@@ -1,11 +1,11 @@
-import {leaguePanel} from './management-ui.js?v=31.1.0';
+import {leaguePanel} from './management-ui.js?v=32.0.0';
 // v23: nombre por carrera y panel de las tres ligas simultáneas.
-import {Game,Net,simProgressDay} from './state.js?v=31.1.0';
-import {Plan} from './ui.js?v=31.1.0';
-import {netDirty} from './net.js?v=31.1.0';
-import {escapeHtml as E,eur} from './util.js?v=31.1.0';
-import {ctx,view} from './canvas.js?v=31.1.0';
-import * as R from './market-model.mjs?v=31.1.0';
+import {Game,Net,simProgressDay} from './state.js?v=32.0.0';
+import {Plan} from './ui.js?v=32.0.0';
+import {netDirty} from './net.js?v=32.0.0';
+import {escapeHtml as E,eur} from './util.js?v=32.0.0';
+import {ctx,view} from './canvas.js?v=32.0.0';
+import * as R from './market-model.mjs?v=32.0.0';
 let draft=null,area=0,tier=0,detail=null;
 const day=()=>simProgressDay();
 const name=()=>R.nameValue(Game.upgrades.kioskName);
