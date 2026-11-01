@@ -1,5 +1,5 @@
-export const VERSION='v32.0.0';
-export const LABEL='v32.0.0 · la marca: mapa de la isla con tus locales (pestaña Isla), capacidad multicanal por primera vez visible (barra, terraza, express y marca nocturna con semáforo) y eventos de marca que mueven afluencia y noches (guía de la isla, reportaje en la tele, queja vecinal) · v31: el imperio con vida propia';
+export const VERSION='v32.1.0';
+export const LABEL='v32.1.0 · vista previa de pruebas: caja inicial de 150.000 € para comprarlo todo — reformas del chiringuito (v30), imperio (v31) y resto de mejoras — · arreglado el banner rojo de consola (ResizeObserver loop): la medida del HUD se aplaza al siguiente frame y el aviso ya no sale';
 document.documentElement.dataset.version=VERSION;
 const old=document.getElementById('version-badge');if(old)old.remove();
 const title=document.getElementById('ver-title');if(title)title.textContent=LABEL;

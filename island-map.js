@@ -2,10 +2,10 @@
    compra: son lugares en el mapa. La pestaña Isla del plan muestra la costa
    de Tenerife con tu chiringuito y los locales del imperio, su noche
    prevista y el acontecimiento de marca. Importado desde ui.js (pestaña). */
-import { Game, BRAND_EVENTS, EMPIRE_EVENT_LABEL, brandEvent, empireIncome, lvl } from './state.js?v=32.0.0';
-import { UPGRADES } from './config.js?v=32.0.0';
-import { $, escapeHtml, eur } from './util.js?v=32.0.0';
-import { Plan } from './ui.js?v=32.0.0';
+import { Game, BRAND_EVENTS, EMPIRE_EVENT_LABEL, brandEvent, empireIncome, lvl } from './state.js?v=32.1.0';
+import { UPGRADES } from './config.js?v=32.1.0';
+import { $, escapeHtml, eur } from './util.js?v=32.1.0';
+import { Plan } from './ui.js?v=32.1.0';
 
 /* Costa sur de Tenerife, oeste → este: Adeje (kiosco), Los Cristianos,
    El Médano. La cadena de compra sigue siendo kiosco → El Médano → Los

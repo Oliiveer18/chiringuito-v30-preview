@@ -1,7 +1,7 @@
-import { scheduleViewportResize, view, setViewTarget } from './canvas.js?v=32.0.0';
-import { computeView, camMode, setCamMode } from './camera.js?v=32.0.0';
-import { W, H } from './config.js?v=32.0.0';
-import { Game } from './state.js?v=32.0.0';
+import { scheduleViewportResize, view, setViewTarget } from './canvas.js?v=32.1.0';
+import { computeView, camMode, setCamMode } from './camera.js?v=32.1.0';
+import { W, H } from './config.js?v=32.1.0';
+import { Game } from './state.js?v=32.1.0';
 const root=document.documentElement;
 let uiTop=0,uiBottom=0;
 /* v29.0.0: la cámara está unificada en camera.js. Los modos barra/mesas ya no
@@ -80,7 +80,16 @@ function setCam(m){
 bar.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('button');if(b)setCam(b.dataset.cam);});
 try{const m=sessionStorage.getItem('lali-oli.cam');if(m==='barra'||m==='mesas')setCamMode(m);}catch(e){}
 setCam(camMode());
-if(window.ResizeObserver){const observer=new ResizeObserver(measure);const h=document.getElementById('hud');if(h)observer.observe(h);const sb=document.getElementById('stockbar');if(sb)observer.observe(sb);}
+/* v32.1.0: el observador de tamaño ya no mide dentro de su propio callback.
+   measure() escribe --top-ui/--inv-w y eso redimensiona justo el HUD y el raíl
+   de inventario que el observador vigila: medir en el mismo frame en que llega
+   la notificación crea el bucle que el navegador reporta como
+   "ResizeObserver loop completed with undelivered notifications" (banner rojo).
+   Se aplaza al siguiente frame — una sola pasada de medida por frame — y el
+   bucle desaparece sin perder ninguna notificación. */
+let measureFrame=0;
+function scheduleMeasure(){cancelAnimationFrame(measureFrame);measureFrame=requestAnimationFrame(measure);}
+if(window.ResizeObserver){const observer=new ResizeObserver(scheduleMeasure);const h=document.getElementById('hud');if(h)observer.observe(h);const sb=document.getElementById('stockbar');if(sb)observer.observe(sb);}
 /* v29.2: la franja de inventario cambia de tamaño al plegarse o al entrar
    en partida: la cámara y los paneles flotantes deben enterarse. */
 const sbEl=document.getElementById('stockbar');

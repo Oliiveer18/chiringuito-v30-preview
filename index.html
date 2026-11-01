@@ -15,7 +15,7 @@
 <link rel="apple-touch-icon" href="icon.svg">
 <link rel="preconnect" href="https://api.fontshare.com" crossorigin>
 <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&f[]=chillax@500,600,700&display=swap">
-<link rel="stylesheet" href="style.css?v=32.0.0">
+<link rel="stylesheet" href="style.css?v=32.1.0">
 <style id="tabs-fix">
   #plan .tabs{overflow-x:auto;overflow-y:hidden;touch-action:pan-x;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
   #plan .tabs .tab{touch-action:pan-x}
@@ -78,6 +78,11 @@
     const b = document.getElementById('errbox');
     if(!b) return;
     if(e.message === 'Script error.' && !e.filename) return;
+    /* v32.1.0: ruido benigno del navegador (bucles de ResizeObserver al medir el
+       HUD) — no es un error del juego y no debe asustar al jugador con el
+       banner rojo. La causa raíz está arreglada en layout.js; esto es cinturón
+       de seguridad por si otro camino lo dispara. */
+    if(/ResizeObserver loop (completed with undelivered notifications|limit exceeded)/.test(e.message || '')) return;
     b.style.display = 'block';
     b.textContent += '[error] ' + (e.message || e.error) + '\n' + (e.filename || '') + ':' + (e.lineno || '') + '\n';
   });
@@ -121,7 +126,7 @@
     });
   }
 </script>
-<script type="module" src="ui-polish.js?v=32.0.0"></script>
-<script type="module" src="game.js?v=32.0.0"></script>
+<script type="module" src="ui-polish.js?v=32.1.0"></script>
+<script type="module" src="game.js?v=32.1.0"></script>
 </body>
 </html>

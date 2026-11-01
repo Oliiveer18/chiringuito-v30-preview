@@ -1,7 +1,7 @@
 /* Pestaña Mejoras del plan: secciones compactas. Importado desde ui.js */
-import { UPGRADES } from './config.js?v=32.0.0';
-import { escapeHtml, eur } from './util.js?v=32.0.0';
-import { Game, BRAND_EVENTS, EMPIRE_EVENT_LABEL, brandEvent, empireIncome, lvl } from './state.js?v=32.0.0';
+import { UPGRADES } from './config.js?v=32.1.0';
+import { escapeHtml, eur } from './util.js?v=32.1.0';
+import { Game, BRAND_EVENTS, EMPIRE_EVENT_LABEL, brandEvent, empireIncome, lvl } from './state.js?v=32.1.0';
 
 const MEJORAS_SECTIONS = [
   { title: 'Reformas del chiringuito', ids: ['palapa', 'terraza', 'escenario'] },

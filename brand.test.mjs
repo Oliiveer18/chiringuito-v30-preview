@@ -43,11 +43,11 @@ let ok = 0, ko = 0;
 const check = (name, cond, extra) => { if (cond) { ok++; console.log('  ok  ' + name); } else { ko++; console.log('  FALLO  ' + name + (extra !== undefined ? ' → ' + JSON.stringify(extra) : '')); } };
 
 /* ---------- módulos reales ---------- */
-const S = await import('./state.js?v=32.0.0');
+const S = await import('./state.js?v=32.1.0');
 const { Game } = S;
-const cfg = await import('./config.js?v=32.0.0');
-const plan = await import('./ui-plan.js?v=32.0.0');
-const map = await import('./island-map.js?v=32.0.0');
+const cfg = await import('./config.js?v=32.1.0');
+const plan = await import('./ui-plan.js?v=32.1.0');
+const map = await import('./island-map.js?v=32.1.0');
 const fresh = () => { Game.upgrades = {}; Game.money = 400; Game.day = 1; Game.rep = 3; };
 
 console.log('Eventos de marca (modelo)');

@@ -3,14 +3,19 @@
    Constantes del juego: dimensiones, calendario, economía, productos,
 clientes habituales, clima, mejoras y personal.
    ========================================================= */
-import { rnd } from './util.js?v=32.0.0';
+import { rnd } from './util.js?v=32.1.0';
 
 // ---------- Constantes ----------
 export const W = 1280, H = 720;
 export const SEC_PER_HOUR = 16;          // segundos reales por hora de juego a 1x
 export const SEASON_DAYS = 30;
 export const GOAL = 10000;
-export const START_MONEY = 400;
+/* v32.1.0 · caja de pruebas: 150.000 € cubren todas las compras del juego con
+   margen — reformas v30 (palapa 3.000 + terraza 12.000 + escenario 30.000 =
+   45.000), imperio v31 (El Médano 25.000 + Los Cristianos 60.000 = 85.000),
+   resto de mejoras (7.600) y género/nóminas. Solo afecta a partidas nuevas:
+   cada temporada arranca con esta caja. */
+export const START_MONEY = 150000;
 export const RENT = 45;
 export const DAY_NAMES = ['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'];
 /* v30: geometría máxima de la cola. La base del juego usa 6 puestos (los 4 de la
